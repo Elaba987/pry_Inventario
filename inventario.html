@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Tienda</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-card h2 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+
+        .login-card .logo {
+            text-align: center;
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #2d3748;
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar h2 {
+            margin-bottom: 30px;
+            font-size: 24px;
+            text-align: center;
+            color: #667eea;
+        }
+
+        .user-info {
+            text-align: center;
+            padding: 15px;
+            background: #4a5568;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .user-info small {
+            opacity: 0.8;
+        }
+
+        .menu-item {
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-item:hover {
+            background: #4a5568;
+            transform: translateX(5px);
+        }
+
+        .menu-item.active {
+            background: #667eea;
+        }
+
+        .logout-btn {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            background: #f56565;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 24px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #f56565;
+            color: white;
+            margin-left: 10px;
+        }
+
+        .btn-secondary {
+            background: #718096;
+            color: white;
+            margin-left: 10px;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        table tr:hover {
+            background: #f7fafc;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-warning {
+            background: #fef5e7;
+            border-left: 4px solid #f39c12;
+            color: #7d6608;
+        }
+
+        .alert-success {
+            background: #edf7ed;
+            border-left: 4px solid #48bb78;
+            color: #22543d;
+        }
+
+        .alert-danger {
+            background: #fee;
+            border-left: 4px solid #f56565;
+            color: #c53030;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h4 {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .venta-item {
+            background: #f7fafc;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .low-stock {
+            color: #f56565;
+            font-weight: bold;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-bar input {
+            flex: 1;
+        }
+
+        .producto-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .producto-selector input {
+            flex: 1;
+        }
+
+        .pago-section {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .pago-section h4 {
+            margin-bottom: 15px;
+        }
+
+        .cambio-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #48bb78;
+            margin-top: 10px;
+        }
+
+        .visita-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .visita-hoy {
+            background: #48bb78;
+            color: white;
+        }
+
+        .visita-pendiente {
+            background: #f39c12;
+            color: white;
+        }
+
+        .visita-completada {
+            background: #cbd5e0;
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <div class="logo">🏪</div>
+            <h2>Mi Tienda</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" required placeholder="correo@ejemplo.com">
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="loginPassword" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Iniciar Sesión</button>
+            </form>
+            <div id="loginError" style="margin-top: 15px;"></div>
+        </div>
+    </div>
+
+    <!-- APLICACIÓN PRINCIPAL -->
+    <div id="mainApp" class="container hidden">
+        <div class="sidebar">
+            <h2>🏪 Mi Tienda</h2>
+            <div class="user-info">
+                <div id="userEmail"></div>
+                <small>Usuario activo</small>
+            </div>
+            <div class="menu-item active" onclick="showSection('dashboard')">
+                📊 Dashboard
+            </div>
+            <div class="menu-item" onclick="showSection('productos')">
+                📦 Productos
+            </div>
+            <div class="menu-item" onclick="showSection('ventas')">
+                💰 Realizar Venta
+            </div>
+            <div class="menu-item" onclick="showSection('proveedores')">
+                🚚 Proveedores
+            </div>
+            <div class="menu-item" onclick="showSection('reportes')">
+                📈 Reportes
+            </div>
+            <button class="logout-btn" onclick="cerrarSesion()">Cerrar Sesión</button>
+        </div>
+
+        <div class="main-content">
+            <!-- DASHBOARD -->
+            <div id="dashboard" class="section">
+                <div class="card">
+                    <h3>Panel de Control</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card" onclick="showSection('reportes')">
+                            <h4>Ventas Hoy</h4>
+                            <div class="stat-value" id="ventasHoy">$0</div>
+                        </div>
+                        <div class="stat-card" onclick="showSection('proveedores')">
+                            <h4>Proveedores Hoy</h4>
+                            <div class="stat-value" id="proveedoresHoy">0</div>
+                        </div>
+                        <div class="stat-card" onclick="showSection('productos')">
+                            <h4>Productos Bajo Stock</h4>
+                            <div class="stat-value" id="bajoStock">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PRODUCTOS -->
+            <div id="productos" class="section hidden">
+                <div class="card">
+                    <h3>Gestión de Productos</h3>
+                    <div id="mensajeProducto"></div>
+                    <form id="formProducto">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Clave</label>
+                                <input type="number" id="clave" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                <input type="text" id="nombre" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Precio</label>
+                                <input type="number" step="0.01" id="precio" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Stock</label>
+                                <input type="number" id="stock" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Registrar Producto</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>Lista de Productos</h3>
+                    <div class="search-bar">
+                        <input type="text" id="buscarProducto" placeholder="Buscar por nombre o clave...">
+                        <select id="ordenarStock" onchange="mostrarProductos()">
+                            <option value="">Sin ordenar</option>
+                            <option value="mayor">Mayor stock</option>
+                            <option value="menor">Menor stock</option>
+                        </select>
+                    </div>
+                    <table id="tablaProductos">
+                        <thead>
+                            <tr>
+                                <th>Clave</th>
+                                <th>Nombre</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- VENTAS -->
+            <div id="ventas" class="section hidden">
+                <div class="card">
+                    <h3>Realizar Venta</h3>
+                    <div class="producto-selector">
+                        <div class="form-group" style="flex: 1; margin: 0;">
+                            <label>Clave del Producto</label>
+                            <input type="number" id="claveVenta" placeholder="Ingrese clave">
+                        </div>
+                        <div style="display: flex; align-items: flex-end;">
+                            <span style="padding: 12px;">O</span>
+                        </div>
+                        <div class="form-group" style="flex: 1; margin: 0;">
+                            <label>Buscar por Nombre</label>
+                            <select id="selectProductoVenta" onchange="seleccionarProductoPorNombre()">
+                                <option value="">-- Seleccione --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="infoProductoVenta"></div>
+                    <div class="form-group">
+                        <label>Cantidad</label>
+                        <input type="number" id="cantidadVenta" min="1" oninput="actualizarInfoStock()">
+                    </div>
+                    <button onclick="agregarAVenta()" class="btn btn-success">Agregar a Venta</button>
+
+                    <div id="listaVenta" style="margin-top: 30px;"></div>
+                    
+                    <div class="pago-section" id="pagoSection" style="display: none;">
+                        <h4>Total a Pagar: $<span id="totalVenta">0.00</span></h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Pago del Cliente</label>
+                                <input type="number" step="0.01" id="pagoCliente" oninput="calcularCambio()" placeholder="0.00">
+                            </div>
+                            <div style="display: flex; align-items: flex-end;">
+                                <button onclick="pagoExacto()" class="btn btn-warning">Pago Exacto</button>
+                            </div>
+                        </div>
+                        <div id="cambioDisplay" class="cambio-display"></div>
+                        <div style="margin-top: 20px;">
+                            <button onclick="finalizarVenta()" class="btn btn-primary">Finalizar Venta</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROVEEDORES -->
+            <div id="proveedores" class="section hidden">
+                <div class="card">
+                    <h3>Registro de Proveedores</h3>
+                    <form id="formProveedor">
+                        <div class="form-group">
+                            <label>Nombre del Proveedor</label>
+                            <input type="text" id="nombreProveedor" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Visita</label>
+                            <select id="tipoVisita" onchange="cambiarTipoVisita()">
+                                <option value="manual">Fecha Manual</option>
+                                <option value="constante">Días Constantes</option>
+                            </select>
+                        </div>
+                        <div id="visitaManual" class="form-group">
+                            <label>Fecha de Visita</label>
+                            <input type="date" id="fechaVisita">
+                        </div>
+                        <div id="visitaConstante" class="form-group hidden">
+                            <label>Días de Visita</label>
+                            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px;">
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" value="0"> Dom
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" value="1"> Lun
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" value="2"> Mar
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" value="3"> Mié
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" value="4"> Jue
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" value="5"> Vie
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" value="6"> Sáb
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Registrar Proveedor</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>Lista de Proveedores</h3>
+                    <div class="search-bar">
+                        <input type="text" id="buscarProveedor" placeholder="Buscar por nombre..." oninput="mostrarProveedores()">
+                        <select id="ordenarProveedor" onchange="mostrarProveedores()">
+                            <option value="proxima">Más Próxima</option>
+                            <option value="lejana">Más Lejana</option>
+                        </select>
+                    </div>
+                    <table id="tablaProveedores">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Tipo</th>
+                                <th>Próxima Visita</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- REPORTES -->
+            <div id="reportes" class="section hidden">
+                <div class="card">
+                    <h3>Reportes y Analíticas</h3>
+                    <div class="form-group">
+                        <label>Tipo de Reporte</label>
+                        <select id="tipoReporte" onchange="generarReporte()">
+                            <option value="diario">Ventas del Día</option>
+                            <option value="semanal">Ventas de la Semana</option>
+                            <option value="mensual">Ventas del Mes</option>
+                        </select>
+                    </div>
+                    <div id="contenidoReporte"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+        // VENTAS
+        function actualizarSelectVenta() {
+            const select = document.getElementById('selectProductoVenta');
+            select.innerHTML = '<option value="">-- Seleccione --</option>';
+            productos.forEach((p, idx) => {
+                select.innerHTML += `<option value="${idx}">${p.nombre} - Stock: ${p.stock}</option>`;
+            });
+        }
+
+        document.getElementById('claveVenta').addEventListener('input', function() {
+            const clave = parseInt(this.value);
+            const producto = productos.find(p => p.clave === clave);
+            
+            if (producto) {
+                productoSeleccionado = producto;
+                document.getElementById('selectProductoVenta').value = '';
+                mostrarInfoProducto();
+            } else {
+                productoSeleccionado = null;
+                document.getElementById('infoProductoVenta').innerHTML = '';
+            }
+        });
+
+        window.seleccionarProductoPorNombre = function() {
+            const idx = document.getElementById('selectProductoVenta').value;
+            if (idx) {
+                productoSeleccionado = productos[idx];
+                document.getElementById('claveVenta').value = productoSeleccionado.clave;
+                mostrarInfoProducto();
+            } else {
+                productoSeleccionado = null;
+                document.getElementById('infoProductoVenta').innerHTML = '';
+            }
+        };
+
+        function mostrarInfoProducto() {
+            if (!productoSeleccionado) return;
+            
+            const stockEnCarrito = ventaActual
+                .filter(item => item.producto.clave === productoSeleccionado.clave)
+                .reduce((sum, item) => sum + item.cantidad, 0);
+            
+            const stockDisponible = productoSeleccionado.stock - stockEnCarrito;
+            
+            const div = document.getElementById('infoProductoVenta');
+            div.innerHTML = `
+                <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                    <strong>${productoSeleccionado.nombre}</strong><br>
+                    Precio: ${productoSeleccionado.precio.toFixed(2)}<br>
+                    Stock disponible: <span class="${stockDisponible < 5 ? 'low-stock' : ''}">${stockDisponible}</span>
+                    ${stockEnCarrito > 0 ? `<br><small>(${stockEnCarrito} ya en carrito)</small>` : ''}
+                </div>
+            `;
+        }
+
+        window.actualizarInfoStock = function() {
+            if (productoSeleccionado) {
+                mostrarInfoProducto();
+            }
+        };
+
+        window.agregarAVenta = function() {
+            if (!productoSeleccionado) {
+                alert('Seleccione un producto');
+                return;
+            }
+            
+            const cantidad = parseInt(document.getElementById('cantidadVenta').value);
+            if (!cantidad || cantidad < 1) {
+                alert('Ingrese una cantidad válida');
+                return;
+            }
+            
+            const stockEnCarrito = ventaActual
+                .filter(item => item.producto.clave === productoSeleccionado.clave)
+                .reduce((sum, item) => sum + item.cantidad, 0);
+            
+            const stockDisponible = productoSeleccionado.stock - stockEnCarrito;
+            
+            if (cantidad > stockDisponible) {
+                alert(`Stock insuficiente. Solo quedan ${stockDisponible} unidades disponibles.`);
+                return;
+            }
+            
+            ventaActual.push({
+                producto: {...productoSeleccionado},
+                cantidad: cantidad,
+                subtotal: productoSeleccionado.precio * cantidad
+            });
+            
+            document.getElementById('cantidadVenta').value = '';
+            document.getElementById('claveVenta').value = '';
+            document.getElementById('selectProductoVenta').value = '';
+            productoSeleccionado = null;
+            document.getElementById('infoProductoVenta').innerHTML = '';
+            
+            mostrarVentaActual();
+        };
+
+        function mostrarVentaActual() {
+            const div = document.getElementById('listaVenta');
+            
+            if (ventaActual.length === 0) {
+                div.innerHTML = '';
+                document.getElementById('pagoSection').style.display = 'none';
+                return;
+            }
+            
+            div.innerHTML = '<h4>Productos en la venta:</h4>';
+            
+            let total = 0;
+            ventaActual.forEach((item, idx) => {
+                total += item.subtotal;
+                div.innerHTML += `
+                    <div class="venta-item">
+                        <div>
+                            <strong>${item.producto.nombre}</strong><br>
+                            Cantidad: ${item.cantidad} x ${item.producto.precio.toFixed(2)}
+                        </div>
+                        <div>
+                            <strong>${item.subtotal.toFixed(2)}</strong>
+                            <button class="btn btn-danger" onclick="quitarDeVenta(${idx})">X</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('totalVenta').textContent = total.toFixed(2);
+            document.getElementById('pagoSection').style.display = 'block';
+            document.getElementById('pagoCliente').value = '';
+            document.getElementById('cambioDisplay').innerHTML = '';
+        }
+
+        window.quitarDeVenta = function(idx) {
+            ventaActual.splice(idx, 1);
+            mostrarVentaActual();
+        };
+
+        window.calcularCambio = function() {
+            const total = parseFloat(document.getElementById('totalVenta').textContent);
+            const pago = parseFloat(document.getElementById('pagoCliente').value) || 0;
+            const cambio = pago - total;
+            
+            const div = document.getElementById('cambioDisplay');
+            if (pago === 0) {
+                div.innerHTML = '';
+            } else if (cambio < 0) {
+                div.innerHTML = `<span style="color: #f56565;">Falta: ${Math.abs(cambio).toFixed(2)}</span>`;
+            } else {
+                div.innerHTML = `Cambio: ${cambio.toFixed(2)}`;
+            }
+        };
+
+        window.pagoExacto = function() {
+            const total = parseFloat(document.getElementById('totalVenta').textContent);
+            document.getElementById('pagoCliente').value = total.toFixed(2);
+            calcularCambio();
+        };
+
+        function descargarTicket(venta, numeroTicket) {
+            const fecha = new Date(venta.fecha);
+            const contenido = `======= TICKET DE VENTA =======
+Fecha: ${fecha.toLocaleDateString()} ${fecha.toLocaleTimeString()}
+Ticket #${numeroTicket}
+
+PRODUCTOS:
+${venta.items.map(item => 
+`${item.producto.nombre}
+  Cantidad: ${item.cantidad} x ${item.producto.precio.toFixed(2)} = ${item.subtotal.toFixed(2)}`
+).join('\n')}
+
+================================
+TOTAL: ${venta.total.toFixed(2)}
+PAGO: ${venta.pago.toFixed(2)}
+CAMBIO: ${venta.cambio.toFixed(2)}
+================================
+
+¡Gracias por su compra!
+`;
+
+            const blob = new Blob([contenido], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `TICKET_${numeroTicket}_${fecha.getDate()}-${fecha.getMonth()+1}-${fecha.getFullYear()}_${fecha.getHours()}-${fecha.getMinutes()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        window.finalizarVenta = function() {
+            if (ventaActual.length === 0) {
+                alert('No hay productos en la venta');
+                return;
+            }
+            
+            const total = parseFloat(document.getElementById('totalVenta').textContent);
+            const pago = parseFloat(document.getElementById('pagoCliente').value) || 0;
+            
+            if (pago < total) {
+                alert('El pago es insuficiente');
+                return;
+            }
+            
+            const cambio = pago - total;
+            
+            ventaActual.forEach(item => {
+                const producto = productos.find(p => p.clave === item.producto.clave);
+                if (producto) {
+                    producto.stock -= item.cantidad;
+                }
+            });
+            
+            const venta = {
+                fecha: new Date().toISOString(),
+                items: ventaActual,
+                total: total,
+                pago: pago,
+                cambio: cambio
+            };
+            
+            ventas.push(venta);
+            guardarDatos();
+            
+            descargarTicket(venta, ventas.length);
+            
+            alert(`Venta realizada exitosamente.\nTotal: ${total.toFixed(2)}\nPago: ${pago.toFixed(2)}\nCambio: ${cambio.toFixed(2)}`);
+            
+            ventaActual = [];
+            mostrarVentaActual();
+            actualizarSelectVenta();
+            actualizarDashboard();
+        };
+
+        // PROVEEDORES
+        window.cambiarTipoVisita = function() {
+            const tipo = document.getElementById('tipoVisita').value;
+            if (tipo === 'manual') {
+                document.getElementById('visitaManual').classList.remove('hidden');
+                document.getElementById('visitaConstante').classList.add('hidden');
+            } else {
+                document.getElementById('visitaManual').classList.add('hidden');
+                document.getElementById('visitaConstante').classList.remove('hidden');
+            }
+        };
+
+        document.getElementById('formProveedor').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const tipo = document.getElementById('tipoVisita').value;
+            const proveedor = {
+                nombre: document.getElementById('nombreProveedor').value,
+                tipo: tipo,
+                visitasCompletadas: []
+            };
+            
+            if (tipo === 'manual') {
+                proveedor.fechaVisita = document.getElementById('fechaVisita').value;
+            } else {
+                const checkboxes = document.querySelectorAll('#visitaConstante input[type="checkbox"]:checked');
+                proveedor.dias = Array.from(checkboxes).map(cb => parseInt(cb.value));
+                
+                if (proveedor.dias.length === 0) {
+                    alert('Seleccione al menos un día');
+                    return;
+                }
+            }
+            
+            proveedores.push(proveedor);
+            guardarDatos();
+            mostrarProveedores();
+            actualizarDashboard();
+            this.reset();
+            cambiarTipoVisita();
+            alert('Proveedor registrado exitosamente');
+        });
+
+        function calcularProximaVisita(proveedor) {
+            if (proveedor.tipo === 'manual') {
+                return new Date(proveedor.fechaVisita);
+            } else {
+                const hoy = new Date();
+                const diaHoy = hoy.getDay();
+                
+                const diasOrdenados = [...proveedor.dias].sort((a, b) => a - b);
+                
+                for (let dia of diasOrdenados) {
+                    if (dia >= diaHoy) {
+                        const proximaVisita = new Date(hoy);
+                        proximaVisita.setDate(hoy.getDate() + (dia - diaHoy));
+                        return proximaVisita;
+                    }
+                }
+                
+                const proximoDia = diasOrdenados[0];
+                const proximaVisita = new Date(hoy);
+                proximaVisita.setDate(hoy.getDate() + (7 - diaHoy + proximoDia));
+                return proximaVisita;
+            }
+        }
+
+        function mostrarProveedores() {
+            const busqueda = document.getElementById('buscarProveedor').value.toLowerCase();
+            const ordenar = document.getElementById('ordenarProveedor').value;
+            
+            let proveedoresFiltrados = proveedores.filter(p => 
+                p.nombre.toLowerCase().includes(busqueda)
+            );
+            
+            proveedoresFiltrados = proveedoresFiltrados.map(p => ({
+                ...p,
+                proximaVisita: calcularProximaVisita(p)
+            }));
+            
+            if (ordenar === 'proxima') {
+                proveedoresFiltrados.sort((a, b) => a.proximaVisita - b.proximaVisita);
+            } else {
+                proveedoresFiltrados.sort((a, b) => b.proximaVisita - a.proximaVisita);
+            }
+            
+            const tbody = document.querySelector('#tablaProveedores tbody');
+            tbody.innerHTML = '';
+            
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            
+            proveedoresFiltrados.forEach((p, idx) => {
+                const idxOriginal = proveedores.findIndex(prov => prov.nombre === p.nombre);
+                const fechaVisita = new Date(p.proximaVisita);
+                fechaVisita.setHours(0, 0, 0, 0);
+                
+                const esHoy = fechaVisita.getTime() === hoy.getTime();
+                let badge = '';
+                
+                if (esHoy) {
+                    badge = '<span class="visita-badge visita-hoy">Hoy</span>';
+                } else if (fechaVisita > hoy) {
+                    badge = '<span class="visita-badge visita-pendiente">Pendiente</span>';
+                }
+                
+                const tipoTexto = p.tipo === 'manual' ? 'Manual' : 'Constante';
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${p.nombre}</td>
+                    <td>${tipoTexto}</td>
+                    <td style="${esHoy ? 'font-weight: bold; color: #667eea;' : ''}">${p.proximaVisita.toLocaleDateString()}</td>
+                    <td>${badge}</td>
+                    <td>
+                        ${esHoy ? `<button class="btn btn-success" onclick="marcarVisita(${idxOriginal})">Marcar Visita</button>` : ''}
+                        <button class="btn btn-danger" onclick="eliminarProveedor(${idxOriginal})">Eliminar</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.marcarVisita = function(idx) {
+            const proveedor = proveedores[idx];
+            const hoy = new Date();
+            
+            if (!proveedor.visitasCompletadas) {
+                proveedor.visitasCompletadas = [];
+            }
+            
+            proveedor.visitasCompletadas.push(hoy.toISOString());
+            
+            if (proveedor.tipo === 'manual') {
+                const confirmar = confirm('Visita marcada. ¿Desea programar la siguiente visita?');
+                if (confirmar) {
+                    const nuevaFecha = prompt('Nueva fecha de visita (YYYY-MM-DD):');
+                    if (nuevaFecha) {
+                        proveedor.fechaVisita = nuevaFecha;
+                    }
+                }
+            }
+            
+            guardarDatos();
+            mostrarProveedores();
+            actualizarDashboard();
+            alert('Visita marcada exitosamente');
+        };
+
+        window.eliminarProveedor = function(idx) {
+            if (confirm('¿Eliminar este proveedor?')) {
+                proveedores.splice(idx, 1);
+                guardarDatos();
+                mostrarProveedores();
+                actualizarDashboard();
+            }
+        };
+
+        // REPORTES
+        function generarReporte() {
+            const tipo = document.getElementById('tipoReporte').value;
+            const div = document.getElementById('contenidoReporte');
+            const ahora = new Date();
+            
+            let ventasFiltradas = [];
+            let titulo = '';
+            
+            if (tipo === 'diario') {
+                titulo = 'Ventas del Día';
+                ventasFiltradas = ventas.filter(v => 
+                    new Date(v.fecha).toDateString() === ahora.toDateString()
+                );
+            } else if (tipo === 'semanal') {
+                titulo = 'Ventas de la Semana';
+                const semanaAtras = new Date(ahora);
+                semanaAtras.setDate(ahora.getDate() - 7);
+                ventasFiltradas = ventas.filter(v => 
+                    new Date(v.fecha) >= semanaAtras
+                );
+            } else if (tipo === 'mensual') {
+                titulo = 'Ventas del Mes';
+                ventasFiltradas = ventas.filter(v => 
+                    new Date(v.fecha).getMonth() === ahora.getMonth() &&
+                    new Date(v.fecha).getFullYear() === ahora.getFullYear()
+                );
+            }
+            
+            const totalVentas = ventasFiltradas.reduce((sum, v) => sum + v.total, 0);
+            const cantidadVentas = ventasFiltradas.length;
+            
+            div.innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>Total Ventas</h4>
+                        <div class="stat-value">${cantidadVentas}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Ingresos Totales</h4>
+                        <div class="stat-value">${totalVentas.toFixed(2)}</div>
+                    </div>
+                </div>
+                <h4>${titulo}</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ticket</th>
+                            <th>Fecha</th>
+                            <th>Productos</th>
+                            <th>Total</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${ventasFiltradas.map((v, idx) => {
+                            const numeroTicket = ventas.indexOf(v) + 1;
+                            return `
+                            <tr>
+                                <td>#${numeroTicket}</td>
+                                <td>${new Date(v.fecha).toLocaleString()}</td>
+                                <td>${v.items.length} producto(s)</td>
+                                <td>${v.total.toFixed(2)}</td>
+                                <td>
+                                    <button class="btn btn-secondary" onclick="descargarTicket(ventas[${ventas.indexOf(v)}], ${numeroTicket})">
+                                        Descargar Ticket
+                                    </button>
+                                </td>
+                            </tr>
+                        `}).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        window.descargarTicket = descargarTicket;
+        window.mostrarProductos = mostrarProductos;
+        window.mostrarProveedores = mostrarProveedores;
+        window.generarReporte = generarReporte;
+    </script>
+</body>
+</html> Configuración de Firebase - REEMPLAZA CON TUS CREDENCIALES
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_AUTH_DOMAIN",
+            projectId: "TU_PROJECT_ID",
+            storageBucket: "TU_STORAGE_BUCKET",
+            messagingSenderId: "TU_MESSAGING_SENDER_ID",
+            appId: "TU_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        let currentUser = null;
+        let productos = [];
+        let proveedores = [];
+        let ventas = [];
+        let ventaActual = [];
+        let productoSeleccionado = null;
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                errorDiv.innerHTML = '<div class="alert alert-danger">Error: ' + error.message + '</div>';
+            }
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                document.getElementById('userEmail').textContent = user.email;
+                cargarDatos();
+            } else {
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('mainApp').classList.add('hidden');
+            }
+        });
+
+        window.cerrarSesion = async () => {
+            await signOut(auth);
+        };
+
+        function cargarDatos() {
+            const userId = currentUser.uid;
+            const datosProductos = localStorage.getItem(`productos_${userId}`);
+            const datosProveedores = localStorage.getItem(`proveedores_${userId}`);
+            const datosVentas = localStorage.getItem(`ventas_${userId}`);
+            
+            if (datosProductos) productos = JSON.parse(datosProductos);
+            if (datosProveedores) proveedores = JSON.parse(datosProveedores);
+            if (datosVentas) ventas = JSON.parse(datosVentas);
+            
+            actualizarDashboard();
+            mostrarProductos();
+            mostrarProveedores();
+            actualizarSelectVenta();
+        }
+
+        function guardarDatos() {
+            const userId = currentUser.uid;
+            localStorage.setItem(`productos_${userId}`, JSON.stringify(productos));
+            localStorage.setItem(`proveedores_${userId}`, JSON.stringify(proveedores));
+            localStorage.setItem(`ventas_${userId}`, JSON.stringify(ventas));
+        }
+
+        window.showSection = function(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(section).classList.remove('hidden');
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                if (item.textContent.includes(section === 'dashboard' ? 'Dashboard' : 
+                   section === 'productos' ? 'Productos' :
+                   section === 'ventas' ? 'Venta' :
+                   section === 'proveedores' ? 'Proveedores' : 'Reportes')) {
+                    item.classList.add('active');
+                }
+            });
+            
+            if (section === 'dashboard') actualizarDashboard();
+            if (section === 'reportes') generarReporte();
+        };
+
+        function actualizarDashboard() {
+            const hoy = new Date().toDateString();
+            const ventasHoy = ventas.filter(v => new Date(v.fecha).toDateString() === hoy);
+            const totalHoy = ventasHoy.reduce((sum, v) => sum + v.total, 0);
+            document.getElementById('ventasHoy').textContent = '$' + totalHoy.toFixed(2);
+            
+            const proveedoresHoy = contarProveedoresHoy();
+            document.getElementById('proveedoresHoy').textContent = proveedoresHoy;
+            
+            const bajoStock = productos.filter(p => p.stock < 5).length;
+            document.getElementById('bajoStock').textContent = bajoStock;
+        }
+
+        function contarProveedoresHoy() {
+            const hoy = new Date();
+            const diaHoy = hoy.getDay();
+            let count = 0;
+
+            proveedores.forEach(p => {
+                if (p.tipo === 'constante') {
+                    if (p.dias && p.dias.includes(diaHoy)) {
+                        count++;
+                    }
+                } else {
+                    const fechaVisita = new Date(p.fechaVisita);
+                    if (fechaVisita.toDateString() === hoy.toDateString()) {
+                        count++;
+                    }
+                }
+            });
+
+            return count;
+        }
+
+        // PRODUCTOS
+        document.getElementById('formProducto').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const clave = parseInt(document.getElementById('clave').value);
+            const claveExiste = productos.some(p => p.clave === clave);
+            
+            if (claveExiste) {
+                const div = document.getElementById('mensajeProducto');
+                div.innerHTML = '<div class="alert alert-danger">⚠️ Clave en uso. Por favor use otra clave.</div>';
+                setTimeout(() => div.innerHTML = '', 3000);
+                return;
+            }
+            
+            const producto = {
+                clave: clave,
+                nombre: document.getElementById('nombre').value,
+                precio: parseFloat(document.getElementById('precio').value),
+                stock: parseInt(document.getElementById('stock').value)
+            };
+            
+            productos.push(producto);
+            guardarDatos();
+            mostrarProductos();
+            actualizarSelectVenta();
+            this.reset();
+            
+            const div = document.getElementById('mensajeProducto');
+            div.innerHTML = '<div class="alert alert-success">✓ Producto registrado exitosamente</div>';
+            setTimeout(() => div.innerHTML = '', 3000);
+        });
+
+        document.getElementById('buscarProducto').addEventListener('input', mostrarProductos);
+
+        function mostrarProductos() {
+            const busqueda = document.getElementById('buscarProducto').value.toLowerCase();
+            const ordenar = document.getElementById('ordenarStock').value;
+            
+            let productosFiltrados = productos.filter(p => 
+                p.nombre.toLowerCase().includes(busqueda) || 
+                p.clave.toString().includes(busqueda)
+            );
+            
+            if (ordenar === 'mayor') {
+                productosFiltrados.sort((a, b) => b.stock - a.stock);
+            } else if (ordenar === 'menor') {
+                productosFiltrados.sort((a, b) => a.stock - b.stock);
+            }
+            
+            const tbody = document.querySelector('#tablaProductos tbody');
+            tbody.innerHTML = '';
+            
+            productosFiltrados.forEach((p, idx) => {
+                const idxOriginal = productos.findIndex(prod => prod.clave === p.clave);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${p.clave}</td>
+                    <td>${p.nombre}</td>
+                    <td>$${p.precio.toFixed(2)}</td>
+                    <td class="${p.stock < 5 ? 'low-stock' : ''}">${p.stock}</td>
+                    <td>
+                        <button class="btn btn-primary" onclick="editarProducto(${idxOriginal})">Editar</button>
+                        <button class="btn btn-danger" onclick="eliminarProducto(${idxOriginal})">Eliminar</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.editarProducto = function(idx) {
+            const p = productos[idx];
+            const nuevoStock = prompt('Nuevo stock para ' + p.nombre + ':', p.stock);
+            if (nuevoStock !== null) {
+                productos[idx].stock = parseInt(nuevoStock);
+                guardarDatos();
+                mostrarProductos();
+                actualizarDashboard();
+            }
+        };
+
+        window.eliminarProducto = function(idx) {
+            if (confirm('¿Eliminar este producto?')) {
+                productos.splice(idx, 1);
+                guardarDatos();
+                mostrarProductos();
+                actualizarDashboard();
+            }
+        };
+
+        //
