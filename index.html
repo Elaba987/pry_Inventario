@@ -903,12 +903,12 @@ CAMBIO: ${venta.cambio.toFixed(2)}
                 }
             }
             
-            proveedores.push(proveedor);
-            guardarDatos();
-            mostrarProveedores();
+            window.proveedores.push(proveedor);
+            window.guardarDatos();
+            window.mostrarProveedores();
             actualizarDashboard();
             this.reset();
-            cambiarTipoVisita();
+            window.cambiarTipoVisita();
             alert('Proveedor registrado exitosamente');
         });
 
@@ -936,11 +936,11 @@ CAMBIO: ${venta.cambio.toFixed(2)}
             }
         }
 
-        function mostrarProveedores() {
+        window.mostrarProveedores = function() {
             const busqueda = document.getElementById('buscarProveedor').value.toLowerCase();
             const ordenar = document.getElementById('ordenarProveedor').value;
             
-            let proveedoresFiltrados = proveedores.filter(p => 
+            let proveedoresFiltrados = window.proveedores.filter(p => 
                 p.nombre.toLowerCase().includes(busqueda)
             );
             
@@ -961,8 +961,8 @@ CAMBIO: ${venta.cambio.toFixed(2)}
             const hoy = new Date();
             hoy.setHours(0, 0, 0, 0);
             
-            proveedoresFiltrados.forEach((p, idx) => {
-                const idxOriginal = proveedores.findIndex(prov => prov.nombre === p.nombre);
+            proveedoresFiltrados.forEach((p) => {
+                const idxOriginal = window.proveedores.findIndex(prov => prov.nombre === p.nombre);
                 const fechaVisita = new Date(p.proximaVisita);
                 fechaVisita.setHours(0, 0, 0, 0);
                 
@@ -990,10 +990,10 @@ CAMBIO: ${venta.cambio.toFixed(2)}
                 `;
                 tbody.appendChild(tr);
             });
-        }
+        };
 
         window.marcarVisita = function(idx) {
-            const proveedor = proveedores[idx];
+            const proveedor = window.proveedores[idx];
             const hoy = new Date();
             
             if (!proveedor.visitasCompletadas) {
@@ -1012,17 +1012,17 @@ CAMBIO: ${venta.cambio.toFixed(2)}
                 }
             }
             
-            guardarDatos();
-            mostrarProveedores();
+            window.guardarDatos();
+            window.mostrarProveedores();
             actualizarDashboard();
             alert('Visita marcada exitosamente');
         };
 
         window.eliminarProveedor = function(idx) {
             if (confirm('¿Eliminar este proveedor?')) {
-                proveedores.splice(idx, 1);
-                guardarDatos();
-                mostrarProveedores();
+                window.proveedores.splice(idx, 1);
+                window.guardarDatos();
+                window.mostrarProveedores();
                 actualizarDashboard();
             }
         };
@@ -1170,11 +1170,11 @@ CAMBIO: ${venta.cambio.toFixed(2)}
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                currentUser = user;
+                window.currentUser = user;
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('mainApp').classList.remove('hidden');
                 document.getElementById('userEmail').textContent = user.email;
-                cargarDatos();
+                window.cargarDatos();
             } else {
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('mainApp').classList.add('hidden');
@@ -1229,14 +1229,105 @@ CAMBIO: ${venta.cambio.toFixed(2)}
 
         function actualizarDashboard() {
             const hoy = new Date().toDateString();
-            const ventasHoy = ventas.filter(v => new Date(v.fecha).toDateString() === hoy);
+            const ventasHoy = window.ventas.filter(v => new Date(v.fecha).toDateString() === hoy);
             const totalHoy = ventasHoy.reduce((sum, v) => sum + v.total, 0);
-            document.getElementById('ventasHoy').textContent = '$' + totalHoy.toFixed(2);
+            document.getElementById('ventasHoy').textContent = '
+
+        // PRODUCTOS
+        document.getElementById('formProducto').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const clave = parseInt(document.getElementById('clave').value);
+            const claveExiste = window.productos.some(p => p.clave === clave);
+            
+            if (claveExiste) {
+                const div = document.getElementById('mensajeProducto');
+                div.innerHTML = '<div class="alert alert-danger">⚠️ Clave en uso. Por favor use otra clave.</div>';
+                setTimeout(() => div.innerHTML = '', 3000);
+                return;
+            }
+            
+            const producto = {
+                clave: clave,
+                nombre: document.getElementById('nombre').value,
+                precio: parseFloat(document.getElementById('precio').value),
+                stock: parseInt(document.getElementById('stock').value)
+            };
+            
+            window.productos.push(producto);
+            window.guardarDatos();
+            window.mostrarProductos();
+            actualizarSelectVenta();
+            this.reset();
+            
+            const div = document.getElementById('mensajeProducto');
+            div.innerHTML = '<div class="alert alert-success">✓ Producto registrado exitosamente</div>';
+            setTimeout(() => div.innerHTML = '', 3000);
+        });
+
+        document.getElementById('buscarProducto').addEventListener('input', () => window.mostrarProductos());
+
+        window.mostrarProductos = function() {
+            const busqueda = document.getElementById('buscarProducto').value.toLowerCase();
+            const ordenar = document.getElementById('ordenarStock').value;
+            
+            let productosFiltrados = window.productos.filter(p => 
+                p.nombre.toLowerCase().includes(busqueda) || 
+                p.clave.toString().includes(busqueda)
+            );
+            
+            if (ordenar === 'mayor') {
+                productosFiltrados.sort((a, b) => b.stock - a.stock);
+            } else if (ordenar === 'menor') {
+                productosFiltrados.sort((a, b) => a.stock - b.stock);
+            }
+            
+            const tbody = document.querySelector('#tablaProductos tbody');
+            tbody.innerHTML = '';
+            
+            productosFiltrados.forEach((p) => {
+                const idxOriginal = window.productos.findIndex(prod => prod.clave === p.clave);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${p.clave}</td>
+                    <td>${p.nombre}</td>
+                    <td>${p.precio.toFixed(2)}</td>
+                    <td class="${p.stock < 5 ? 'low-stock' : ''}">${p.stock}</td>
+                    <td>
+                        <button class="btn btn-primary" onclick="editarProducto(${idxOriginal})">Editar</button>
+                        <button class="btn btn-danger" onclick="eliminarProducto(${idxOriginal})">Eliminar</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        window.editarProducto = function(idx) {
+            const p = window.productos[idx];
+            const nuevoStock = prompt('Nuevo stock para ' + p.nombre + ':', p.stock);
+            if (nuevoStock !== null) {
+                window.productos[idx].stock = parseInt(nuevoStock);
+                window.guardarDatos();
+                window.mostrarProductos();
+                actualizarDashboard();
+            }
+        };
+
+        window.eliminarProducto = function(idx) {
+            if (confirm('¿Eliminar este producto?')) {
+                window.productos.splice(idx, 1);
+                window.guardarDatos();
+                window.mostrarProductos();
+                actualizarDashboard();
+            }
+        };
+
+        // + totalHoy.toFixed(2);
             
             const proveedoresHoy = contarProveedoresHoy();
             document.getElementById('proveedoresHoy').textContent = proveedoresHoy;
             
-            const bajoStock = productos.filter(p => p.stock < 5).length;
+            const bajoStock = window.productos.filter(p => p.stock < 5).length;
             document.getElementById('bajoStock').textContent = bajoStock;
         }
 
@@ -1245,7 +1336,7 @@ CAMBIO: ${venta.cambio.toFixed(2)}
             const diaHoy = hoy.getDay();
             let count = 0;
 
-            proveedores.forEach(p => {
+            window.proveedores.forEach(p => {
                 if (p.tipo === 'constante') {
                     if (p.dias && p.dias.includes(diaHoy)) {
                         count++;
