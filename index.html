@@ -337,16 +337,18 @@ import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from
 // ---------------------- FIREBASE CONFIG ----------------------
 // Reemplaza con tus credenciales desde Firebase Console
 const firebaseConfig = {
-    apiKey: "TU_API_KEY",
-    authDomain: "TU_AUTH_DOMAIN",
-    projectId: "TU_PROJECT_ID",
-    storageBucket: "TU_STORAGE_BUCKET",
-    messagingSenderId: "TU_MESSAGING_SENDER_ID",
-    appId: "TU_APP_ID"
+  apiKey: "AIzaSyAUToHTzGwL4T17TdZSMgLqC1OlCyqX7Dk",
+  authDomain: "pry-inventario.firebaseapp.com",
+  projectId: "pry-inventario",
+  storageBucket: "pry-inventario.firebasestorage.app",
+  messagingSenderId: "506657425434",
+  appId: "1:506657425434:web:bfdb24edd1917f402f69a3",
+  measurementId: "G-5NJ7LH40H9"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+const analytics = getAnalytics(app);
 
 // ---------------------- VARIABLES GLOBALES ----------------------
 let currentUser = null;
@@ -925,3 +927,4 @@ window.guardarDatos = guardarDatos;
 window.cargarDatos = cargarDatos;
 window.mostrarVentaActual = mostrarVentaActual;
 window.actualizarSelectVenta = actualizarSelectVenta;
+
