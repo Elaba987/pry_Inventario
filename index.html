@@ -881,6 +881,32 @@ CAMBIO: ${venta.cambio.toFixed(2)}
             }
         };
 
+        window.marcarVisita = function(idx) {
+            const proveedor = window.proveedores[idx];
+            const hoy = new Date();
+            
+            if (!proveedor.visitasCompletadas) {
+                proveedor.visitasCompletadas = [];
+            }
+            
+            proveedor.visitasCompletadas.push(hoy.toISOString());
+            
+            if (proveedor.tipo === 'manual') {
+                const confirmar = confirm('Visita marcada. ¿Desea programar la siguiente visita?');
+                if (confirmar) {
+                    const nuevaFecha = prompt('Nueva fecha de visita (YYYY-MM-DD):');
+                    if (nuevaFecha) {
+                        proveedor.fechaVisita = nuevaFecha;
+                    }
+                }
+            }
+            
+            window.guardarDatos();
+            window.mostrarProveedores();
+            actualizarDashboard();
+            alert('Visita marcada exitosamente');
+        };
+
         document.getElementById('formProveedor').addEventListener('submit', function(e) {
             e.preventDefault();
             
