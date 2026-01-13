@@ -142,6 +142,11 @@
             margin-left: 10px;
         }
 
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -168,12 +173,6 @@
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
-        }
-
-        .alert-warning {
-            background: #fef5e7;
-            border-left: 4px solid #f39c12;
-            color: #7d6608;
         }
 
         .alert-success {
@@ -262,26 +261,53 @@
             margin-bottom: 20px;
         }
 
-        .producto-selector input {
-            flex: 1;
+        .pago-section {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
         }
 
-        .stock-indicator {
+        .pago-section h4 {
+            margin-bottom: 15px;
+        }
+
+        .cambio-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #48bb78;
+            margin-top: 10px;
+        }
+
+        .visita-badge {
             display: inline-block;
             padding: 5px 10px;
             border-radius: 5px;
+            font-size: 12px;
             font-weight: bold;
-            margin-left: 10px;
         }
 
-        .stock-ok {
-            background: #c6f6d5;
-            color: #22543d;
+        .visita-hoy {
+            background: #48bb78;
+            color: white;
         }
 
-        .stock-low {
-            background: #fed7d7;
-            color: #c53030;
+        .visita-pendiente {
+            background: #f39c12;
+            color: white;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: normal;
         }
     </style>
 </head>
@@ -410,9 +436,22 @@
                     <button onclick="agregarAVenta()" class="btn btn-success">Agregar a Venta</button>
 
                     <div id="listaVenta" style="margin-top: 30px;"></div>
-                    <div style="margin-top: 20px; text-align: right;">
-                        <h3>Total: $<span id="totalVenta">0.00</span></h3>
-                        <button onclick="finalizarVenta()" class="btn btn-primary">Finalizar Venta</button>
+                    
+                    <div class="pago-section" id="pagoSection" style="display: none;">
+                        <h4>Total a Pagar: $<span id="totalVenta">0.00</span></h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Pago del Cliente</label>
+                                <input type="number" step="0.01" id="pagoCliente" oninput="calcularCambio()" placeholder="0.00">
+                            </div>
+                            <div style="display: flex; align-items: flex-end;">
+                                <button onclick="pagoExacto()" class="btn btn-warning">Pago Exacto</button>
+                            </div>
+                        </div>
+                        <div id="cambioDisplay" class="cambio-display"></div>
+                        <div style="margin-top: 20px;">
+                            <button onclick="finalizarVenta()" class="btn btn-primary">Finalizar Venta</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -422,24 +461,31 @@
                 <div class="card">
                     <h3>Registro de Proveedores</h3>
                     <form id="formProveedor">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Nombre del Proveedor</label>
-                                <input type="text" id="nombreProveedor" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Teléfono</label>
-                                <input type="tel" id="telefonoProveedor" required>
-                            </div>
+                        <div class="form-group">
+                            <label>Nombre del Proveedor</label>
+                            <input type="text" id="nombreProveedor" required>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Email</label>
-                                <input type="email" id="emailProveedor" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Próxima Visita</label>
-                                <input type="date" id="fechaVisita" required>
+                        <div class="form-group">
+                            <label>Tipo de Visita</label>
+                            <select id="tipoVisita" onchange="cambiarTipoVisita()">
+                                <option value="manual">Fecha Manual</option>
+                                <option value="constante">Días Constantes</option>
+                            </select>
+                        </div>
+                        <div id="visitaManual" class="form-group">
+                            <label>Fecha de Visita</label>
+                            <input type="date" id="fechaVisita">
+                        </div>
+                        <div id="visitaConstante" class="form-group hidden">
+                            <label>Días de Visita</label>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" value="0"> Dom</label>
+                                <label><input type="checkbox" value="1"> Lun</label>
+                                <label><input type="checkbox" value="2"> Mar</label>
+                                <label><input type="checkbox" value="3"> Mié</label>
+                                <label><input type="checkbox" value="4"> Jue</label>
+                                <label><input type="checkbox" value="5"> Vie</label>
+                                <label><input type="checkbox" value="6"> Sáb</label>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Registrar Proveedor</button>
@@ -448,13 +494,20 @@
 
                 <div class="card">
                     <h3>Lista de Proveedores</h3>
+                    <div class="search-bar">
+                        <input type="text" id="buscarProveedor" placeholder="Buscar por nombre..." oninput="mostrarProveedores()">
+                        <select id="ordenarProveedor" onchange="mostrarProveedores()">
+                            <option value="proxima">Más Próxima</option>
+                            <option value="lejana">Más Lejana</option>
+                        </select>
+                    </div>
                     <table id="tablaProveedores">
                         <thead>
                             <tr>
                                 <th>Nombre</th>
-                                <th>Teléfono</th>
-                                <th>Email</th>
+                                <th>Tipo</th>
                                 <th>Próxima Visita</th>
+                                <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -534,14 +587,32 @@
             const totalHoy = ventasHoy.reduce((sum, v) => sum + v.total, 0);
             document.getElementById('ventasHoy').textContent = '$' + totalHoy.toFixed(2);
             
-            const proveedoresHoy = proveedores.filter(p => {
-                const fechaVisita = new Date(p.fechaVisita).toDateString();
-                return fechaVisita === hoy;
-            }).length;
+            const proveedoresHoy = contarProveedoresHoy();
             document.getElementById('proveedoresHoy').textContent = proveedoresHoy;
             
             const bajoStock = productos.filter(p => p.stock < 5).length;
             document.getElementById('bajoStock').textContent = bajoStock;
+        }
+
+        function contarProveedoresHoy() {
+            const hoy = new Date();
+            const diaHoy = hoy.getDay();
+            let count = 0;
+
+            proveedores.forEach(p => {
+                if (p.tipo === 'constante') {
+                    if (p.dias && p.dias.includes(diaHoy)) {
+                        count++;
+                    }
+                } else {
+                    const fechaVisita = new Date(p.fechaVisita);
+                    if (fechaVisita.toDateString() === hoy.toDateString()) {
+                        count++;
+                    }
+                }
+            });
+
+            return count;
         }
 
         // PRODUCTOS
@@ -596,7 +667,7 @@
             const tbody = document.querySelector('#tablaProductos tbody');
             tbody.innerHTML = '';
             
-            productosFiltrados.forEach((p, idx) => {
+            productosFiltrados.forEach((p) => {
                 const idxOriginal = productos.findIndex(prod => prod.clave === p.clave);
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -734,6 +805,13 @@
 
         function mostrarVentaActual() {
             const div = document.getElementById('listaVenta');
+            
+            if (ventaActual.length === 0) {
+                div.innerHTML = '';
+                document.getElementById('pagoSection').style.display = 'none';
+                return;
+            }
+            
             div.innerHTML = '<h4>Productos en la venta:</h4>';
             
             let total = 0;
@@ -754,11 +832,35 @@
             });
             
             document.getElementById('totalVenta').textContent = total.toFixed(2);
+            document.getElementById('pagoSection').style.display = 'block';
+            document.getElementById('pagoCliente').value = '';
+            document.getElementById('cambioDisplay').innerHTML = '';
         }
 
         function quitarDeVenta(idx) {
             ventaActual.splice(idx, 1);
             mostrarVentaActual();
+        }
+
+        function calcularCambio() {
+            const total = parseFloat(document.getElementById('totalVenta').textContent);
+            const pago = parseFloat(document.getElementById('pagoCliente').value) || 0;
+            const cambio = pago - total;
+            
+            const div = document.getElementById('cambioDisplay');
+            if (pago === 0) {
+                div.innerHTML = '';
+            } else if (cambio < 0) {
+                div.innerHTML = `<span style="color: #f56565;">Falta: ${Math.abs(cambio).toFixed(2)}</span>`;
+            } else {
+                div.innerHTML = `Cambio: ${cambio.toFixed(2)}`;
+            }
+        }
+
+        function pagoExacto() {
+            const total = parseFloat(document.getElementById('totalVenta').textContent);
+            document.getElementById('pagoCliente').value = total.toFixed(2);
+            calcularCambio();
         }
 
         function descargarTicket(venta, numeroTicket) {
@@ -770,11 +872,13 @@ Ticket #${numeroTicket}
 PRODUCTOS:
 ${venta.items.map(item => 
 `${item.producto.nombre}
-  Cantidad: ${item.cantidad} x $${item.producto.precio.toFixed(2)} = $${item.subtotal.toFixed(2)}`
+  Cantidad: ${item.cantidad} x ${item.producto.precio.toFixed(2)} = ${item.subtotal.toFixed(2)}`
 ).join('\n')}
 
 ================================
-TOTAL: $${venta.total.toFixed(2)}
+TOTAL: ${venta.total.toFixed(2)}
+PAGO: ${venta.pago.toFixed(2)}
+CAMBIO: ${venta.cambio.toFixed(2)}
 ================================
 
 ¡Gracias por su compra!
@@ -797,7 +901,15 @@ TOTAL: $${venta.total.toFixed(2)}
                 return;
             }
             
-            const total = ventaActual.reduce((sum, item) => sum + item.subtotal, 0);
+            const total = parseFloat(document.getElementById('totalVenta').textContent);
+            const pago = parseFloat(document.getElementById('pagoCliente').value) || 0;
+            
+            if (pago < total) {
+                alert('El pago es insuficiente');
+                return;
+            }
+            
+            const cambio = pago - total;
             
             ventaActual.forEach(item => {
                 const producto = productos.find(p => p.clave === item.producto.clave);
@@ -809,7 +921,9 @@ TOTAL: $${venta.total.toFixed(2)}
             const venta = {
                 fecha: new Date().toISOString(),
                 items: ventaActual,
-                total: total
+                total: total,
+                pago: pago,
+                cambio: cambio
             };
             
             ventas.push(venta);
@@ -817,7 +931,7 @@ TOTAL: $${venta.total.toFixed(2)}
             
             descargarTicket(venta, ventas.length);
             
-            alert('Venta realizada exitosamente. Total: $' + total.toFixed(2));
+            alert(`Venta realizada exitosamente.\nTotal: ${total.toFixed(2)}\nPago: ${pago.toFixed(2)}\nCambio: ${cambio.toFixed(2)}`);
             
             ventaActual = [];
             mostrarVentaActual();
@@ -826,50 +940,152 @@ TOTAL: $${venta.total.toFixed(2)}
         }
 
         // PROVEEDORES
+        function cambiarTipoVisita() {
+            const tipo = document.getElementById('tipoVisita').value;
+            if (tipo === 'manual') {
+                document.getElementById('visitaManual').classList.remove('hidden');
+                document.getElementById('visitaConstante').classList.add('hidden');
+            } else {
+                document.getElementById('visitaManual').classList.add('hidden');
+                document.getElementById('visitaConstante').classList.remove('hidden');
+            }
+        }
+
         document.getElementById('formProveedor').addEventListener('submit', function(e) {
             e.preventDefault();
             
+            const tipo = document.getElementById('tipoVisita').value;
             const proveedor = {
                 nombre: document.getElementById('nombreProveedor').value,
-                telefono: document.getElementById('telefonoProveedor').value,
-                email: document.getElementById('emailProveedor').value,
-                fechaVisita: document.getElementById('fechaVisita').value
+                tipo: tipo,
+                visitasCompletadas: []
             };
+            
+            if (tipo === 'manual') {
+                proveedor.fechaVisita = document.getElementById('fechaVisita').value;
+            } else {
+                const checkboxes = document.querySelectorAll('#visitaConstante input[type="checkbox"]:checked');
+                proveedor.dias = Array.from(checkboxes).map(cb => parseInt(cb.value));
+                
+                if (proveedor.dias.length === 0) {
+                    alert('Seleccione al menos un día');
+                    return;
+                }
+            }
             
             proveedores.push(proveedor);
             guardarDatos();
             mostrarProveedores();
             actualizarDashboard();
             this.reset();
+            cambiarTipoVisita();
             alert('Proveedor registrado exitosamente');
         });
 
+        function calcularProximaVisita(proveedor) {
+            if (proveedor.tipo === 'manual') {
+                return new Date(proveedor.fechaVisita);
+            } else {
+                const hoy = new Date();
+                const diaHoy = hoy.getDay();
+                
+                const diasOrdenados = [...proveedor.dias].sort((a, b) => a - b);
+                
+                for (let dia of diasOrdenados) {
+                    if (dia >= diaHoy) {
+                        const proximaVisita = new Date(hoy);
+                        proximaVisita.setDate(hoy.getDate() + (dia - diaHoy));
+                        return proximaVisita;
+                    }
+                }
+                
+                const proximoDia = diasOrdenados[0];
+                const proximaVisita = new Date(hoy);
+                proximaVisita.setDate(hoy.getDate() + (7 - diaHoy + proximoDia));
+                return proximaVisita;
+            }
+        }
+
         function mostrarProveedores() {
+            const busqueda = document.getElementById('buscarProveedor').value.toLowerCase();
+            const ordenar = document.getElementById('ordenarProveedor').value;
+            
+            let proveedoresFiltrados = proveedores.filter(p => 
+                p.nombre.toLowerCase().includes(busqueda)
+            );
+            
+            proveedoresFiltrados = proveedoresFiltrados.map(p => ({
+                ...p,
+                proximaVisita: calcularProximaVisita(p)
+            }));
+            
+            if (ordenar === 'proxima') {
+                proveedoresFiltrados.sort((a, b) => a.proximaVisita - b.proximaVisita);
+            } else {
+                proveedoresFiltrados.sort((a, b) => b.proximaVisita - a.proximaVisita);
+            }
+            
             const tbody = document.querySelector('#tablaProveedores tbody');
             tbody.innerHTML = '';
             
-            proveedores.sort((a, b) => new Date(a.fechaVisita) - new Date(b.fechaVisita));
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
             
-            proveedores.forEach((p, idx) => {
-                const tr = document.createElement('tr');
-                const fechaVisita = new Date(p.fechaVisita);
-                const hoy = new Date();
-                hoy.setHours(0, 0, 0, 0);
+            proveedoresFiltrados.forEach((p) => {
+                const idxOriginal = proveedores.findIndex(prov => prov.nombre === p.nombre);
+                const fechaVisita = new Date(p.proximaVisita);
                 fechaVisita.setHours(0, 0, 0, 0);
                 
                 const esHoy = fechaVisita.getTime() === hoy.getTime();
+                let badge = '';
                 
+                if (esHoy) {
+                    badge = '<span class="visita-badge visita-hoy">Hoy</span>';
+                } else if (fechaVisita > hoy) {
+                    badge = '<span class="visita-badge visita-pendiente">Pendiente</span>';
+                }
+                
+                const tipoTexto = p.tipo === 'manual' ? 'Manual' : 'Constante';
+                
+                const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${p.nombre}</td>
-                    <td>${p.telefono}</td>
-                    <td>${p.email}</td>
-                    <td style="${esHoy ? 'font-weight: bold; color: #667eea;' : ''}">${new Date(p.fechaVisita).toLocaleDateString()}</td>
+                    <td>${tipoTexto}</td>
+                    <td style="${esHoy ? 'font-weight: bold; color: #667eea;' : ''}">${p.proximaVisita.toLocaleDateString()}</td>
+                    <td>${badge}</td>
                     <td>
-                        <button class="btn btn-danger" onclick="eliminarProveedor(${idx})">Eliminar</button>
+                        ${esHoy ? `<button class="btn btn-success" onclick="marcarVisita(${idxOriginal})">Marcar Visita</button>` : ''}
+                        <button class="btn btn-danger" onclick="eliminarProveedor(${idxOriginal})">Eliminar</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
+        }
+
+        function marcarVisita(idx) {
+            const proveedor = proveedores[idx];
+            const hoy = new Date();
+            
+            if (!proveedor.visitasCompletadas) {
+                proveedor.visitasCompletadas = [];
+            }
+            
+            proveedor.visitasCompletadas.push(hoy.toISOString());
+            
+            if (proveedor.tipo === 'manual') {
+                const confirmar = confirm('Visita marcada. ¿Desea programar la siguiente visita?');
+                if (confirmar) {
+                    const nuevaFecha = prompt('Nueva fecha de visita (YYYY-MM-DD):');
+                    if (nuevaFecha) {
+                        proveedor.fechaVisita = nuevaFecha;
+                    }
+                }
+            }
+            
+            guardarDatos();
+            mostrarProveedores();
+            actualizarDashboard();
+            alert('Visita marcada exitosamente');
         }
 
         function eliminarProveedor(idx) {
@@ -936,7 +1152,7 @@ TOTAL: $${venta.total.toFixed(2)}
                         </tr>
                     </thead>
                     <tbody>
-                        ${ventasFiltradas.map((v, idx) => {
+                        ${ventasFiltradas.map((v) => {
                             const numeroTicket = ventas.indexOf(v) + 1;
                             return `
                             <tr>
